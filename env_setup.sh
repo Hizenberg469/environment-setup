@@ -23,7 +23,9 @@ function settingUpVimrc {
     
     # Installing the required packages for plugin.
     $user apt install universal-ctags -y
-     
+    $user apt install -y global
+
+
     # Setting up the .vimrc
     
     VIMRC_LOCATION=$(find $HOME/ .vimrc)
@@ -44,8 +46,9 @@ function settingUpVimrc {
 function removeVimrc {
     
     $user apt purge universal-ctags -y
+    $user apt install -y global
 
-    VIMRC_LOCATION=$(find $HOME/ -iwholename .vimrc.bck)
+    VIMRC_LOCATION=$(find $HOME/ -type f -name .vimrc.bck)
     if [ "$HOME/.vimrc.bck" = "$VIMRC_LOCATION" ]; then
 
         rm $HOME/.vimrc
@@ -64,9 +67,11 @@ function settingUpLatestVim {
 
 
     $user apt install -y libncurses5-dev libgtk2.0-dev libatk1.0-dev \
-libcairo2-dev libx11-dev libxpm-dev libxt-dev python2-dev \
+libcairo2-dev libx11-dev libxpm-dev libxt-dev python3-dev \
 python3-dev ruby-dev lua5.2 liblua5.2-dev libperl-dev git
-
+    
+    $user apt install -y libncurses-dev
+    
     # Clone the vim official repo.
     git clone https://github.com/vim/vim.git ~/
 
@@ -81,6 +86,10 @@ python3-dev ruby-dev lua5.2 liblua5.2-dev libperl-dev git
     if [ '$DIR' = '/usr/local' ]; then
         $user apt remove -y vim vim-runtime gvim
         $user apt remove -y vim-tiny vim-comman vim-gui-comman vim-nox
+    else
+        $user mkdir ~/Vim
+        $user mkdir ~/Vim/share/vim/vim91
+        sudo echo -e "\n\n\nalias vim=~/Vim" >> ~/.bashrc
     fi
     
 
@@ -94,7 +103,7 @@ python3-dev ruby-dev lua5.2 liblua5.2-dev libperl-dev git
                 --with-python3-config-dir=$(python3-config --configdir) \
                 --enable-perlinterp=yes \
                 --enable-luainterp=yes \
-                --enable-gui=gtk2 \
+                --enable-gui=gtk3 \
                 --enable-cscope \
                 --prefix=$DIR
 
@@ -108,6 +117,10 @@ python3-dev ruby-dev lua5.2 liblua5.2-dev libperl-dev git
     
     echo "Current directory: $(pwd)"
     $user checkinstall --fstrans=no # To avoid temporary filesystem translation issue.
+    
+
+    # Install plugin for vim-plug.
+    vim +PlugInstall +qall
 }
 
 
@@ -115,9 +128,7 @@ python3-dev ruby-dev lua5.2 liblua5.2-dev libperl-dev git
 function removeVim {
     
     # Uninstall Vim
-    $user apt purge -y vim-comman
-    $user apt purge -y vim-runtime
-    $user apt purge -y vim-tiny
+    $user apt purge -y vim
 
     $user apt purge -y libncurses5-dev libgtk2.0-dev libatk1.0-dev \
 libcairo2-dev libx11-dev libxpm-dev libxt-dev \

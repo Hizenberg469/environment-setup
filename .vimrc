@@ -295,6 +295,8 @@ let g:gutentags_cache_dir = expand('~/.cache/tags')
 
 " change focus to quickfix window after search (optional).
 "let g:gutentags_plus_switch = 1
+let g:gutentags_trace = 1
+let g:gutentags_define_advanced_commands = 1
 
 
 
