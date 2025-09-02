@@ -156,11 +156,11 @@ call plug#begin()
     Plug 'tpope/vim-fugitive'      " A popular Git Wrapper.
     Plug 'tpope/vim-speeddating'   " A plugin that allow you to quickly adjust dates.
     Plug 'vim-airline/vim-airline' " A lightweight and customizable status line.
+    Plug 'vim-airline/vim-airline-themes' " Themes for airline
     Plug 'vim-scripts/c.vim'       " A packages of tools for C and C++.
     Plug 'vimwiki/vimwiki'         " A personal wiki plugin for Vim.
     Plug 'voldikss/vim-floaterm'   " A plugin for floating terminal inside vim.
     Plug 'tpope/vim-commentary' " Commenting tool
-    Plug 'vim-airline/vim-airline-themes' " Themes for airline
     Plug 'vim-scripts/DoxygenToolkit.vim' " Doxygen support
     Plug 'vim-scripts/SpellCheck' " Spell checking
     Plug 'ludovicchabant/vim-gutentags' " for tag managements for projects
@@ -227,9 +227,11 @@ autocmd BufRead,BufNewFile *.c,*.cpp,*.h,*.hpp call SetClangTidyConfig()
 
 " Set this. Airline will handle the rest.
 let g:airline#extensions#ale#enabled = 1
+let g:airline_theme = 'dark'
 
 
-
+" For mbbill/undotree: quick undo access
+nmap <F5> :UndotreeToggle<CR>
 
 
 " For tpope/vim-fugitive - git integration.
@@ -244,7 +246,10 @@ nnoremap <Leader>gdv :Gvdiffsplit<CR>
 nnoremap <Leader>gdh :Gdiffsplit<CR>
 
 
-" For airblade/vim-gitgutter - git status reporting line by line
+" vim-airline:vim-airline: the status line for vim
+let g:airline_powerline_fonts = 1
+
+
 
 
 " For preservim/nerdtree: the battle tested file explorer
@@ -283,6 +288,27 @@ autocmd vimenter * ++nested colorscheme gruvbox
 
 " For rainbow coloring of Parentheses
 let g:rainbow_active = 1 "set to 0 if you want to enable it later via :RainbowToggle
+
+
+
+
+" habamax/vim-asciidoctor: Asciidoctor tools for vim
+let g:asciidoctor_folding = 1
+let g:asciidoctor_fold_options = 1
+let g:asciidoctor_fenced_languages = ['vim', 'sh', 'python', 'c', 'javascript']
+
+
+
+
+" voldikss/vim-floaterm: floating terminal
+nnoremap <C-t> :FloatermToggle!<CR>
+augroup FloatermMapping
+    autocmd!
+    autocmd FileType floaterm nnoremap <buffer> <Esc> <C-\><C-n>:FloatermToggle<CR>
+    autocmd FileType floaterm inoremap <buffer> <Esc> <C-\><C-n>:FloatermToggle<CR>
+augroup end
+tnoremap <Esc> <C-\><C-n>:FloatermToggle<CR>
+
 
 
 
