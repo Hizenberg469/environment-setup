@@ -75,6 +75,16 @@ libpython3-dev ruby-dev lua5.2 liblua5.2-dev libperl-dev git
         echo -e "\nexport VIMRUNTIME=$DIR/share/vim/vim91" >> ~/bashrc
         echo -e "\nexport PATH=$DIR/bin:\$PATH" >> ~/.bashrc
         echo -e "\nexport TERM=st-256color" >> ~/.bashrc
+        # Manually do:
+        # tmux attach
+        # tmux set-option -ga terminal-overrides ",st-256color:Tc"
+        # tmux detach
+        # tmux attach
+        #
+        # Check:
+        # tmux info | grep Tc
+        #
+        # it should not be Tc: [missing]
         source ~/.bashrc
     fi
     
