@@ -23,7 +23,8 @@ function settingUpVimrc {
     # Installing the required packages for plugin.
     $user apt install universal-ctags -y
     $user apt install -y global
-
+    $user apt install -y clang-tidy
+    $user apt install -y clang-format
 
     # Setting up the .vimrc
     VIMRC_LOCATION=$($user find $HOME/ .vimrc)
@@ -70,7 +71,9 @@ libpython3-dev ruby-dev lua5.2 liblua5.2-dev libperl-dev git
     else
         mkdir $DIR
         mkdir -p $DIR/share/vim/vim91
-        echo -e "\n\n\nalias vim=~/Vim" >> ~/.bashrc
+        echo -e "\n\n\nalias vim=$DIR/bin/vim" >> ~/.bashrc
+        echo -e "\nexport VIMRUNTIME=$DIR/share/vim/vim91" >> ~/bashrc
+        echo -e "\nexport PATH=$DIR/bin:\$PATH" >> ~/.bashrc
         source ~/.bashrc
     fi
     
