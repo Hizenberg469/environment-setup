@@ -63,6 +63,7 @@ set number
 " This disables the creation of backup files.
 set nobackup
 
+" To allow moving to different buffer without saving the current buffer.
 set hidden
 
 
@@ -256,6 +257,8 @@ let NERDTreeShowHidden = 1
 " For majutsushi/tagbar: the ultimate tag bar
 nmap <F8> :TagbarToggle<CR>
 
+
+
 " For morhetz/gruvbox
 "Use 24-bit (true-color) mode in Vim/Neovim when outside tmux.
 "If you're using tmux version 2.2 or later, you can remove the outermost $TMUX check and use tmux's 24-bit color support
@@ -295,7 +298,7 @@ let g:gutentags_cache_dir = expand('~/.cache/tags')
 
 " change focus to quickfix window after search (optional).
 "let g:gutentags_plus_switch = 1
-let g:gutentags_trace = 1
+"let g:gutentags_trace = 1
 let g:gutentags_define_advanced_commands = 1
 
 

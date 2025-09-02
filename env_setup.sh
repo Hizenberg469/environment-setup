@@ -9,7 +9,6 @@ cmt
 
 
 user=""
-
 if [ "$(whoami)" = "root" ]; then
     user=""
 else
@@ -27,35 +26,26 @@ function settingUpVimrc {
 
 
     # Setting up the .vimrc
-    
-    VIMRC_LOCATION=$(find $HOME/ .vimrc)
+    VIMRC_LOCATION=$($user find $HOME/ .vimrc)
     if [ "$HOME/.vimrc" = "$VIMRC_LOCATION" ]; then
-
-        mv $HOME/.vimrc $HOME/.vimrc.bck
-
+        $user mv $HOME/.vimrc $HOME/.vimrc.bck
     fi
 
-
     cp $(pwd)/.vimrc $HOME/.vimrc
-
 }
 
 
 # To remove vimrc.
 
 function removeVimrc {
-    
     $user apt purge universal-ctags -y
     $user apt install -y global
 
-    VIMRC_LOCATION=$(find $HOME/ -type f -name .vimrc.bck)
+    VIMRC_LOCATION=$($user find $HOME/ -type f -name .vimrc.bck)
     if [ "$HOME/.vimrc.bck" = "$VIMRC_LOCATION" ]; then
-
-        rm $HOME/.vimrc
-        mv $HOME/.vimrc.bck $HOME/.vimrc
-
+        $user rm $HOME/.vimrc
+        $user mv $HOME/.vimrc.bck $HOME/.vimrc
     fi
-
 }
 
 
@@ -64,21 +54,12 @@ function removeVimrc {
 function settingUpLatestVim {
     
     # Installing the required packages.
-
-
-    $user apt install -y libncurses5-dev libgtk2.0-dev libatk1.0-dev \
-libcairo2-dev libx11-dev libxpm-dev libxt-dev python3-dev \
-python3-dev ruby-dev lua5.2 liblua5.2-dev libperl-dev git
+    $user apt install -y libncurses-dev libatk1.0-dev \
+libcairo2-dev libx11-dev libxpm-dev libxt-dev \
+libpython3-dev ruby-dev lua5.2 liblua5.2-dev libperl-dev git
     
-    $user apt install -y libncurses-dev
-    
-    # Clone the vim official repo.
-    git clone https://github.com/vim/vim.git ~/
-
     # Configure for compilation.
-    
     local DIR='/usr/local' # Directory to setup the latest vim build.
-    
     if [ $# -gt 0 ]; then
         DIR=$1
     fi
@@ -87,12 +68,12 @@ python3-dev ruby-dev lua5.2 liblua5.2-dev libperl-dev git
         $user apt remove -y vim vim-runtime gvim
         $user apt remove -y vim-tiny vim-comman vim-gui-comman vim-nox
     else
-        $user mkdir ~/Vim
-        $user mkdir ~/Vim/share/vim/vim91
-        sudo echo -e "\n\n\nalias vim=~/Vim" >> ~/.bashrc
+        mkdir $DIR
+        mkdir -p $DIR/share/vim/vim91
+        echo -e "\n\n\nalias vim=~/Vim" >> ~/.bashrc
+        source ~/.bashrc
     fi
     
-
     cd ~
     git clone https://github.com/vim/vim.git
     cd ~/vim
@@ -103,21 +84,26 @@ python3-dev ruby-dev lua5.2 liblua5.2-dev libperl-dev git
                 --with-python3-config-dir=$(python3-config --configdir) \
                 --enable-perlinterp=yes \
                 --enable-luainterp=yes \
-                --enable-gui=gtk3 \
+                --enable-gui=no \
                 --enable-cscope \
                 --prefix=$DIR
-
+   
+    # Issue in wayland header file. Hence, running this.
+    cd ~/vim/src/auto/wayland/
+    make
 
     cd ~/vim/src
-    make #VIMRUNTIMEDIR=$DIR/share/vim/vim91
+    make VIMRUNTIMEDIR=$DIR/share/vim/vim91
 
     # To track the source build as a package for easy uninstallation.
     $user apt install checkinstall
     cd ~/vim/src
     
-    echo "Current directory: $(pwd)"
-    $user checkinstall --fstrans=no # To avoid temporary filesystem translation issue.
-    
+    if [ '/usr/local' = $DIR ]; then
+        $user checkinstall --fstrans=no # To avoid temporary filesystem translation issue.
+    else
+        make install
+    fi
 
     # Install plugin for vim-plug.
     vim +PlugInstall +qall
@@ -130,13 +116,11 @@ function removeVim {
     # Uninstall Vim
     $user apt purge -y vim
 
-    $user apt purge -y libncurses5-dev libgtk2.0-dev libatk1.0-dev \
+    $user apt purge -y libncurses-dev libatk1.0-dev \
 libcairo2-dev libx11-dev libxpm-dev libxt-dev \
-python3-dev ruby-dev lua5.2 liblua5.2-dev libperl-dev git
-    
+libpython3-dev ruby-dev lua5.2 liblua5.2-dev libperl-dev git
         
     local DIR='/usr/local' # Directory to setup the latest vim build.
-    
     if [ $# -gt 0 ]; then
         DIR=$1
     fi
@@ -155,7 +139,6 @@ python3-dev ruby-dev lua5.2 liblua5.2-dev libperl-dev git
 # To setup YouCompleteMe (YCM)
 
 function settingUpYCM {
-
     cd ~/
     
     # Installing Vundle and installing the plugin. Also, for vim-plug manager.
@@ -184,11 +167,8 @@ function removeYCM {
 
 ################ Starting the execution here ###################
 # If directory is mentioned.
-echo "All arguments: $@"
 opts=$(getopt -o a --long help,dir::,mode: -- "$@")
 eval set -- "$opts"
-echo "All arguments after getopt: $@"
-echo "Argument count: $#"
 
 VIM_DIR=""
 MODE=""
@@ -204,7 +184,7 @@ do
                 ;;
 
         --help)  echo -e "$0 --dir=<directory for vim installation> --mode install|uninstall\n" \
-                 "--dir  : Optional\n" \
+                 "--dir  : Optional [E.g: --dir=$HOME/Vim ]\n" \
                  "--mode : install ( setting up the environment )\n" \
                  "         uninstall ( returning to default )\n"
                  shift
@@ -217,7 +197,6 @@ do
            exit 1 
            ;;
     esac
-
 done
 
 
@@ -231,9 +210,7 @@ if [ "install" = "$MODE" ]; then
     fi
     
     settingUpYCM
-
 elif [ "uninstall" = "$MODE" ]; then
-    
     removeVimrc
 
     if [ "" = "$VIM_DIR" ]; then
@@ -243,10 +220,8 @@ elif [ "uninstall" = "$MODE" ]; then
     fi
 
     removeYCM
-
     $user apt clean
 else
-
     echo "Wrong argument to --mode option"\
         "Use env_set.sh --help"
     exit 1
