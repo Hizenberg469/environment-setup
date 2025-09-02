@@ -228,6 +228,8 @@ autocmd BufRead,BufNewFile *.c,*.cpp,*.h,*.hpp call SetClangTidyConfig()
 " Set this. Airline will handle the rest.
 " let g:airline#extensions#ale#enabled = 1
 let g:airline_theme = 'dark'
+let g:airline#extensions#tabline#enabled = 1
+let g:airline#extensions#tabline#formatter = 'default'
 
 
 " For mbbill/undotree: quick undo access
