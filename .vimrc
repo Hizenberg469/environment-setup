@@ -319,6 +319,7 @@ tnoremap <Esc> <C-\><C-n>:FloatermToggle<CR>
 let g:gutentags_modules = ['ctags', 'gtags_cscope']
 
 " config project root markers.
+let g:gutentags_add_default_project_roots = 0
 let g:gutentags_project_root = ['.root', '.git']
 
 " generate datebases in my cache directory, prevent gtags files polluting my project
