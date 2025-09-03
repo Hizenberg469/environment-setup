@@ -74,7 +74,8 @@ libpython3-dev ruby-dev lua5.2 liblua5.2-dev libperl-dev git
         echo -e "\n\n\nalias vim=$DIR/bin/vim" >> ~/.bashrc
         echo -e "\nexport VIMRUNTIME=$DIR/share/vim/vim91" >> ~/bashrc
         echo -e "\nexport PATH=$DIR/bin:\$PATH" >> ~/.bashrc
-        echo -e "\nexport TERM=st-256color" >> ~/.bashrc
+        echo -e "\nexport TERM=screen-256color" >> ~/.bashrc
+        echo -e "\nalias tmux='tmux -u'" >> ~/.bashrc
         # Manually do:
         # tmux attach
         # tmux set-option -ga terminal-overrides ",st-256color:Tc"
