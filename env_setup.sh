@@ -58,7 +58,9 @@ function settingUpLatestVim {
     $user apt install -y libncurses-dev libatk1.0-dev \
 libcairo2-dev libx11-dev libxpm-dev libxt-dev \
 libpython3-dev ruby-dev lua5.2 liblua5.2-dev libperl-dev git
-    
+   
+    $user apt install -y python2
+
     # Configure for compilation.
     local DIR='/usr/local' # Directory to setup the latest vim build.
     if [ $# -gt 0 ]; then

@@ -165,6 +165,7 @@ call plug#begin()
     Plug 'vim-scripts/SpellCheck' " Spell checking
     Plug 'ludovicchabant/vim-gutentags' " for tag managements for projects
     Plug 'skywind3000/gutentags_plus'   " Working with gtags and cscope
+    Plug 'rdnetto/YCM-Generator', { 'branch': 'stable'} " for generating and helping YCM
 call plug#end()
 
 

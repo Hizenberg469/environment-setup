@@ -1,0 +1,12 @@
+For generating compiler flag database for makefile projects.
+
+https://pypi.org/project/compiledb/
+
+
+For ale:
+https://github.com/dense-analysis/ale
+
+
+For YCM:
+https://github.com/ycm-core/YouCompleteMe?tab=readme-ov-file#option-2-provide-the-flags-manually
+https://github.com/ycm-core/YouCompleteMe?tab=readme-ov-file#commands
