@@ -325,11 +325,21 @@ let g:gutentags_project_root = ['.root', '.git']
 let g:gutentags_cache_dir = expand('~/.cache/tags')
 
 " change focus to quickfix window after search (optional).
-"let g:gutentags_plus_switch = 1
+let g:gutentags_plus_switch = 1
 "let g:gutentags_trace = 1
 let g:gutentags_define_advanced_commands = 1
 
-
+let g:gutentags_plus_nomap = 1
+noremap <silent> <leader>css :GscopeFind s <C-R><C-W><cr>
+noremap <silent> <leader>csg :GscopeFind g <C-R><C-W><cr>
+noremap <silent> <leader>csc :GscopeFind c <C-R><C-W><cr>
+noremap <silent> <leader>cst :GscopeFind t <C-R><C-W><cr>
+noremap <silent> <leader>cse :GscopeFind e <C-R><C-W><cr>
+noremap <silent> <leader>csf :GscopeFind f <C-R>=expand("<cfile>")<cr><cr>
+noremap <silent> <leader>csi :GscopeFind i <C-R>=expand("<cfile>")<cr><cr>
+noremap <silent> <leader>csd :GscopeFind d <C-R><C-W><cr>
+noremap <silent> <leader>csa :GscopeFind a <C-R><C-W><cr>
+noremap <silent> <leader>csz :GscopeFind z <C-R><C-W><cr>
 
 
 " To install using Vundle: :PluginInstall
