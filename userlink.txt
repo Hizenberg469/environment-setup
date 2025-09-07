@@ -10,3 +10,7 @@ For ale:
 For YCM:
 https://github.com/ycm-core/YouCompleteMe?tab=readme-ov-file#option-2-provide-the-flags-manually
 https://github.com/ycm-core/YouCompleteMe?tab=readme-ov-file#commands
+
+
+For asciidoctor writer guide:
+https://asciidoctor.org/docs/asciidoc-writers-guide/

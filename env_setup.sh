@@ -123,7 +123,10 @@ libpython3-dev ruby-dev lua5.2 liblua5.2-dev libperl-dev git
     fi
     
     #Symbolic just in case.
-    $user ln -s $DIR/share/vim/vim91 /usr/share/vim
+    $user ln -s $DIR/share/vim/vim91 /usr/share/vim || {
+        $user rm -rf /usr/share/vim
+        $user ln -s $DIR/share/vim/vim91 /usr/share/vim
+    }
 
     # Install plugin for vim-plug.
     vim +PlugInstall +qall
