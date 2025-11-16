@@ -1,0 +1,263 @@
+" c: Automatically break comments using the textwidth value.
+" r: Automatically insert the comment leader when hitting <Enter> in insert mode.
+" o: Automatically insert the comment leader when hitting 'o' or 'O' in normal mode.
+" n: Recognize numbered lists. When hitting <Enter> in insert mode.
+" m: Automatically break the current line before inserting a new comment line.
+set formatoptions+=cronm
+
+" This sets the width of a tab character to 4 spaces.
+set tabstop=4
+
+" This sets the number of spaces used when the <Tab> key is pressed in insert
+" mode to 4.
+set softtabstop=4
+
+" This sets the number of spaces used for each indentation level when using
+" the '>' and '<' commands, as well as the autoindent feature.
+set shiftwidth=4
+
+" This setting enables automatic indentation, which will copy the indentation
+" of the current line when starting a new line.
+set autoindent
+set smartindent
+
+" This disables the automatic conversion of tabs to spaces when you press the
+" <Tab> key.
+set expandtab
+set smarttab
+
+" Save 1,000 items in history
+set history=1000
+
+" Show the line and column number of the cursor position
+set ruler
+
+" Display the incomplete commands in the bottom right-hand side of your screen.  
+set showcmd
+
+" Display completion matches on your status line
+set wildmenu
+
+" Show a few lines of context around the cursor
+set scrolloff=5
+
+" Highlight search matches
+set hlsearch
+
+" Enable incremental searching
+set incsearch
+
+" Ignore case when searching
+set ignorecase
+
+" Override the 'ignorecase' option if the search pattern contains upper case characters.
+set smartcase
+
+" This enables the use of the mouse in all modes (normal, visual, insert,
+" command-line, etc.).
+set mouse=a
+
+" This displays relative line numbers in the left margin.
+set number
+set relativenumber
+
+" This disables the creation of backup files.
+set nobackup
+
+" To allow moving to different buffer without saving the current buffer.
+set hidden
+
+" This disables the creation of swap files.
+set noswapfile
+
+" Automatically reload files when they change
+set autoread
+
+" Enable spell checking
+"set spell
+"set spelllang=en
+
+" Highlight the current line
+"set cursorline
+
+" Highlight the 100th column
+" set colorcolumn=100
+
+" Set text width to 100
+set textwidth=100
+
+" This maps the '<' and '>' keys in visual mode to shift the selected text one
+" shift width to the left or right and reselect the shifted text.
+vnoremap < <gv
+vnoremap > >gv
+
+" The next four lines define key mappings for switching between windows using
+" Ctrl + hjkl keys
+nmap <silent> <c-k> :wincmd k<CR>
+nmap <silent> <c-j> :wincmd j<CR>
+nmap <silent> <c-h> :wincmd h<CR>
+nmap <silent> <c-l> :wincmd l<CR>
+
+" The next four lines define key mappings for resizing windows using Alt +
+" hjkl keys:
+map <a-l> :vertical res -5<CR>
+map <a-h> :vertical res +5<CR>
+map <a-j> :res -5<CR>
+map <a-k> :res +5<CR>
+
+" These lines define key mappings for moving the cursor 10 spaces at a time
+" using Shift + arrow keys:
+nmap <S-l> 10l<CR>
+nmap <S-h> 10h<CR>
+nmap <S-j> 10j<CR>
+nmap <S-k> 10k<CR>
+
+" Enable folding
+set foldenable
+" Configure fold method
+set foldmethod=marker
+" Set the fold level to start with all folds open
+set foldlevelstart=99
+" Set the fold nesting level (default is 20)
+set foldnestmax=10
+" Automatically close folds when the cursor leaves them
+set foldclose=all
+" Open folds upon all motion events
+set foldopen=all
+
+
+"Plugin
+"===========================================================================================================
+filetype plugin indent on
+syntax on
+
+
+" Enhanced C and C++ highlighting for vim
+"++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+" Disable function highlighting (affects both C and C++ files)
+let g:cpp_function_highlight = 1
+
+" Enable highlighting of C++11 attributes
+let g:cpp_attributes_highlight = 1
+
+" Highlight struct/class member variables (affects both C and C++ files)
+let g:cpp_member_highlight = 1
+
+" Disable highlighting of type names in class, struct, union, enum, using, and
+" concept declarations (affects both C and C++ files)
+let g:cpp_type_name_highlight = 1 
+
+" Highlight operators (affects both C and C++ files)
+let g:cpp_operator_highlight = 1
+
+" Put all standard C and C++ keywords under Vim's highlight group 'Statement'
+" (affects both C and C++ files)
+let g:cpp_simple_highlight = 1
+
+
+" Color scheme for vim
+" vscode
+"+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+" If you don't like many colors and prefer the conservative style of the standard Visual Studio
+let g:codedark_conservative=1
+" If you like the new dark modern colors (Needs feedback!)
+let g:codedark_modern=1
+" Activates italicized comments (make sure your terminal supports italics)
+let g:codedark_italics=1
+" Make the background transparent
+let g:codedark_transparent=1
+" If you have vim-airline, you can also enable the provided theme
+let g:airline_theme = 'codedark'
+
+colorscheme codedark
+
+" Tagbar
+"++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+nmap <F8> :TagbarToggle<CR>
+
+
+" Airline
+"+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+" Set this. Airline will handle the rest.
+" let g:airline#extensions#ale#enabled = 1
+let g:airline_theme = 'dark'
+let g:airline#extensions#tabline#enabled = 1
+let g:airline#extensions#tabline#formatter = 'default'
+
+
+" YCM : YouCompleteMe
+"++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+function! s:YCMEnable() abort
+    silent! packadd YouCompleteMe
+    echo "YouCompleteMe enabled"
+endfunction
+
+command! YCMOn  call s:YCMEnable()
+
+
+" ALE : Linting 
+"+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+function! s:ALEEnable() abort
+    silent! packadd ale
+
+    let g:ale_linters = {
+    \   'cpp': ['cppcheck'],
+    \   'c': ['cppcheck'],
+    \   }
+
+    " General settings
+    let g:ale_linters_explicit = 1
+    let g:ale_completion_enabled = 1
+    let g:ale_echo_msg_format = '[%linter%] %s [%severity%]'
+    let g:ale_set_balloons=1
+    let g:ale_hover_to_floating_preview=1
+    let g:ale_use_global_executables = 1
+    let g:ale_sign_column_always = 1
+    let g:ale_disable_lsp = 1
+
+    " Set this. Airline will handle the rest.
+    let g:airline#extensions#ale#enabled = 1
+
+    echo "ALE enabled"
+endfunction
+
+function! s:ALEDisable() abort
+    
+    let g:ale_linters = {
+    \   'cpp': [''],
+    \   'c': [''],
+    \   }
+
+    " General settings
+    let g:ale_linters_explicit = 0 
+    let g:ale_completion_enabled = 0 
+    let g:ale_echo_msg_format = ''
+    let g:ale_set_balloons = 0
+    let g:ale_hover_to_floating_preview = 0
+    let g:ale_use_global_executables = 0
+    let g:ale_sign_column_always = 0 
+    let g:ale_disable_lsp = 0
+
+    " Set this. Airline will handle the rest.
+    let g:airline#extensions#ale#enabled = 0
+
+    echo "ALE disabled"
+endfunction
+
+command! ALEOn  call s:ALEEnable()
+command! ALEOff call s:ALEDisable()
+
+function! s:CodeQueryEnable() abort
+    silent! packadd unite.vim
+    silent! packadd vim-codequery
+
+    echo "CodeQuery setup done"
+endfunction
+
+command! CQOn  call s:CodeQueryEnable()
+
+" My vimrc end -- Hizenberg
