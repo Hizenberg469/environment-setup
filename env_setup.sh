@@ -5,38 +5,52 @@
 #ORIGINAL_DIR: Directory where this script is present
 #               along with other required utility
 #               to setup the Dev environment.
+#
 #REPO_HOSTING_PLATFORM ( Eg. github, gitlab, etc )
+#
 #CODEQUERY_GUI
 #   YES - To install codequery with GUI.
 #   NO  - To install codequery without GUI.
 #
+#INSTALL_YCM
+#   YES - To setup the YCM
+#   NO  - To not setup the YCM
+#
+#INSTALL_CODEQUERY
+#   YES - To setup the codequery
+#   NO  - To not setup the codequery
+#
+#INSTALL_VIM_CODEQUERY
+#   YES - To setup the vim-codequery
+#   NO  - To not setup the vim-codequery
+#   
 # Peform the below command before executing this script.
 #   source $PWD/env_variable
 
 RETURN_SUCCESS=0
 RETURN_FAILURE=255
+PASSWORD=""
 my_vimrc='$ORIGINAL_DIR/my_vimrc'
 essential_plugins=( 
-    WolfgangMehner/bash-support,
-    WolfgangMehner/c-support,
-    WolfgangMehner/perl-support,
-    preservim/nerdtree,
-    luochen1990/rainbow,
-    preservim/tagbar,
-    mbbill/undotree,
-    vim-airline/vim-airline,
-    vim-airline/vim-airline-themes,
-    bfrg/vim-c-cpp-modern,
-    kovetskiy/vim-bash,
-    tomasiser/vim-code-dark,
-    ArthurSonzogni/Diagon,
-    tpope/vim-commentary,
-    tpope/vim-fugitive
+    "WolfgangMehner/bash-support",
+    "WolfgangMehner/c-support",
+    "WolfgangMehner/perl-support",
+    "preservim/nerdtree",
+    "luochen1990/rainbow",
+    "preservim/tagbar",
+    "mbbill/undotree",
+    "vim-airline/vim-airline",
+    "vim-airline/vim-airline-themes",
+    "bfrg/vim-c-cpp-modern",
+    "kovetskiy/vim-bash",
+    "tomasiser/vim-code-dark",
+    "ArthurSonzogni/Diagon",
+    "tpope/vim-commentary",
+    "tpope/vim-fugitive"
 )   
 
 optional_plugins=(
-    dense-analysis/ale,
-    ycm-core/YouCompleteMe
+    "dense-analysis/ale"
 )
 
 # checkStatus 1 -- To exit the script
@@ -76,7 +90,7 @@ function printStatus {
     message=$1
     status=$2
     
-    expected_status_number=0
+    expected_status_number=$RETURN_SUCCESS
     if [ $# -gt 2 ] ; then
        expected_status_number=$2
     fi
@@ -86,7 +100,36 @@ function printStatus {
     fi
 }
 
-# findFileOrDir <file or dir name> {(opt)dir} {(opt)type[t|d]} {(opt)maxdepth}
+# printStatus <message> <status> {(optional}expected-status>
+function logStatus {
+    
+    if [ $# -lt 2 ]  || [ $# -gt 3 ] ; then
+        echo -e "Status message and status return value is not passed.\nNeed to fail due to incorrect script."
+        exit $RETURN_FAILURE
+    fi
+
+    message=$1
+    status=$2
+    
+    expected_status_number=$RETURN_SUCCESS
+    if [ $# -gt 2 ] ; then
+       expected_status_number=$2
+    fi
+    
+    findFileOrDir "status.txt" "$ORIGINAL_DIR" "f" 
+    status=$?
+    if [ "$status" -ne $RETURN_SUCCESS ] ; then
+        touch "$ORIGINAL_DIR/status.txt"
+    fi
+    
+    if [ $status -ne $expected_status_number ] ; then
+        echo -e "$message : Failure" >> $ORIGINAL_DIR/status.txt
+    else
+        echo -e "$message : Done" >> $ORIGINAL_DIR/status.txt
+    fi
+}
+
+# findFileOrDir <file or dir name> {(opt)dir} {(opt)type[f|d]} 
 # return "" if not found
 # return path to where it is present if found
 function findFileOrDir {
@@ -99,7 +142,7 @@ properly used."
     fi
 
     name=$1
-    seach_dir="."
+    search_dir="."
     type="f"
  
     if [ $# -gt 1 ] ; then
@@ -110,16 +153,13 @@ properly used."
         type=$3
     fi
 
-    is_present=""
-    if [ $# -gt 3 ] ; then
-        mx_depth=$3
-        is_present=$(find $search_dir -maxdepth $mx_depth -type $type -name $name | head -1)
-    else
-        is_present=$(find $search_dir -type $type -name $name | head -1)
-    fi
-
+    is_present=$(find "$search_dir" -type "$type" -name "$name" | head -1)
     checkStatus 0
-    return $is_present
+    
+    if [ "$is_present" = "$search_dir/$name" ] ; then
+        return $RETURN_SUCCESS
+    fi
+    return $RETURN_FAILURE
 }
 
 # checkPkgIsInstalled <pkg-name> {(opt)number -- whether to install the package}
@@ -139,14 +179,14 @@ function checkPkgIsInstalled {
         to_install=$2
     fi
 
-    is_installed=$(dpkg-query -W -f='${binary:Package}\n' | grep -wo 'qmake' | head -1)
-    if [ '$is_installed' = '$pkg_name' ] ; then
+    is_installed=$(dpkg-query -W -f='${binary:Package}\n' | grep -wo "$pkg_name" | head -1)
+    if [ "$is_installed" = "$pkg_name" ] ; then
         echo "$pkg_name is already installed"
         return $RETURN_SUCCESS # Installed
     else
         if [ $to_install -eq 1 ] ; then
             echo "Installing the package: $pkg_name"
-            sudo apt install $pkg_name -y
+            echo $PASSWORD | sudo -S apt install $pkg_name -y
             checkStatus 0 "Unsuccessful in installing $pkg_name"
             status=$?
             if [ $status -eq 0 ] ; then
@@ -159,7 +199,7 @@ function checkPkgIsInstalled {
     return $RETURN_FAILURE # Not Installed
 }
 
-#checkReposIsCloned <repo> <path> {(opt)to be cloned or not} {(opt)to clone recursively} {(opt)
+#checkRepoIsCloned <repo> <path> {(opt)to be cloned or not} {(opt)to clone recursively} {(opt)
 #hosting platform}
 #{ to be cloned or not} : 1 for clonning , 0 for not clonning
 #{ to clone recursively} : 1 for YES, 0 for no
@@ -172,6 +212,7 @@ function checkRepoIsCloned {
     fi
 
     repo=$1
+    repo_name="${repo##*/}"
     path=$2
     to_cloned=0
     if [ $# -gt 2 ] ; then
@@ -188,11 +229,11 @@ function checkRepoIsCloned {
         repo_hosting_platform=$4
     fi
 
-    findFileOrDir "$1" "$2" "d" "1"
+    findFileOrDir "$repo_name" "$path" "d" 1
     is_dir_present=$?
-    if [ "$is_dir_present" != "$2/$1" ] ; then
+    if [ "$is_dir_present" -eq $RETURN_FAILURE ] ; then
         if [ $to_cloned -eq 1 ] ; then
-            if [ $is_recursize -eq 1 ] ; then
+            if [ $is_recursive -eq 1 ] ; then
                 git clone --recurse-submodules "$repo_hosting_platform/$repo.git" "$path" 
             else
                 git clone "$repo_hosting_platorm/$repo.git" "$path"
@@ -262,7 +303,7 @@ function setUpPluginDir {
 
         echo ".vim directory is created for plugins"
     else
-        echo ".vim directoyr is already present for plugins"
+        echo ".vim directory is already present for plugins"
     fi
     return $RETURN_SUCCESS
 }
@@ -271,10 +312,10 @@ function setUpPluginDir {
 
 function setUpYCM {
    
-    checkRepoIsCloned "${optional_plugins[ ${#optional_plugins[@]} - 1 ] }.git" "$HOME/.vim/pack/default/opt/" 1 1
+    checkRepoIsCloned "ycm-core/YouCompleteMe" "$HOME/.vim/pack/default/opt" 1 1
 
     checkPkgIsInstalled "build-essential" 1
-    checkPkgIsInstalled "cmake3" 1
+    checkPkgIsInstalled "cmake" 1
     checkPkgIsInstalled "python3-dev" 1
     
     cd ~/.vim/pack/default/opt/YouCompleteMe
@@ -282,7 +323,8 @@ function setUpYCM {
     python3 install.py --clangd-completer
     checkStatus 0 "Failure!!! YCM is not configured for C/C++ projects"
     status=$?
-
+    
+    cd $ORIGINAL_DIR
     return $status
 }
 
@@ -318,7 +360,7 @@ function setUpCodeQuery {
 
     for (( i=0 ; i < ${#req_packages[@]} ; i++ ))
     do
-        checkPkgIsInstalled "$req_packages[ $i ]" 1
+        checkPkgIsInstalled "$req_packages[$i]" 1
         status=$?
         
         if [ $status -ne 0 ] ; then
@@ -332,9 +374,9 @@ function setUpCodeQuery {
         return $RETURN_FAILURE
     fi
 
-    findFileOrDir "codequery" "$HOME/tools" "d" "2" 
+    findFileOrDir "codequery" "$HOME/tools" "d" 
     is_dir_present=$?
-    if [ "$is_dir_present" != "$HOME/tools/codequery" ] ; then
+    if [ "$is_dir_present" -eq $RETURN_FAILURE ] ; then
         mkdir -p $HOME/tools/codequery
     fi
 
@@ -343,7 +385,7 @@ function setUpCodeQuery {
     if [ "$CODEQUERY_GUI" = "YES" ] ; then
         for (( i=0 ; i < ${#gui_packages[@]} ; i++ ))
         do
-            checkPkgIsInstalled "$gui_packages[ $i ]" 1
+            checkPkgIsInstalled "$gui_packages[$i]" 1
             status=$?
 
             if [ $status -ne 0 ] ; then
@@ -356,7 +398,20 @@ function setUpCodeQuery {
     fi
 
     cmake --build build
-    sudo cmake --install build
+    status=$?
+    checkStatus 0 "Unsuccessful in building the codequery"
+    if [ $status -ne 0 ] ; then
+        return $RETURN_FAILURE
+    fi
+
+    echo $PASSWORD | sudo -S cmake --install build
+    status=$?
+    checkStatus 0 "Unsuccessful in installing the codequery"
+    if [ $status -ne 0 ] ; then
+        return $RETURN_FAILURE
+    fi
+    
+    return $RETURN_SUCCESS
 }
 
 
@@ -368,7 +423,7 @@ function setUpVimCodeQuery {
         return $RETURN_FAILURE
     fi
 
-    checkReposIsCloned "devjoe/vim-codequery" "$HOME/.vim/pack/default/opt/" 1
+    checkRepoIsCloned "devjoe/vim-codequery" "$HOME/.vim/pack/default/opt/" 1
     status=$?
     if [ $status -ne 0 ] ; then
         return $RETURN_FAILURE
@@ -381,4 +436,129 @@ BANNER=$(<banner.txt)
 echo "$BANNER" 
 
 
+#   Start the setup
+environment_variable=(
+    "ORIGINAL_DIR",
+    "REPO_HOSTING_PLATFORM",
+    "CODEQUERY_GUI",
+    "INSTALL_YCM",
+    "INSTALL_CODEQUERY",
+    "INSTALL_VIM_CODEQUERY"
+)
 
+echo "Do you want to create the template for env_variable file to configure you setup?"
+choise=""
+echo "yes : To create the template and quit to configure it"
+echo "no  : To move on with configuration"
+read -p "Your choise : " choise
+
+if [ "$choise" = "yes" ] ; then
+    rm $PWD/env_variable
+    touch $PWD/env_variable
+
+    
+    for env_var in "${!environment_variable[@]}";
+    do
+       echo "$env_var=" >> $PWD/env_variable
+    done
+
+    exit $RETURN_SUCCESS
+elif [ "$choise" = "no" ] ; then
+    
+    findFileOrDir "env_variable" "$PWD" "f" 
+    status=$?
+    if [ "$status" -eq $RETURN_FAILURE ] ; then
+        echo "env_variable is not present"
+        echo "Create the template and configure it first"
+        exit $RETURN_FAILURE
+    fi
+
+else
+
+    echo "Error: Entered unknown choise"
+    exit $RETURN_FAILURE
+fi
+
+source "$PWD/env_variable"
+declare -A env_var_map=(
+    ["ORIGINAL_DIR"]="$ORIGINAL_DIR"
+    ["REPO_HOSTING_PLATFORM"]="$REPO_HOSTING_PLATFORM"
+    ["CODEQUERY_GUI"]="$CODEQUERY_GUI"
+    ["INSTALL_YCM"]="$INSTALL_YCM"
+    ["INSTALL_CODEQUERY"]="$INSTALL_CODEQUERY"
+    ["INSTALL_VIM_CODEQUERY"]="$INSTALL_VIM_CODEQUERY"
+)
+
+echo "Are you sure about the below configuration?"
+for env_var in "${!env_var_map[@]}";
+do
+   echo "$env_var : ${env_var_map["$env_var"]}"
+done
+
+choise=""
+echo "yes : To move on with the current configuration for setup"
+echo "no  : To quit the setup"
+read -p "Your choise : " choise
+
+if [ "$choise" = "no" ] ; then
+    exit $RETURN_SUCCESS
+elif [ "$choise" = "yes" ] ; then
+    echo "Moving forward with configuration"
+else
+    echo "Error: Entered unknown choice" 
+    exit $RETURN_FAILURE
+fi
+
+read -sp "Your password to executing requiring sudo access:" PASSWORD
+
+rm $ORIGINAL_DIR/status.txt
+# Setting the .vimrc first
+setUpVimrc
+status=$?
+logStatus "Setting up .virmc: " $status 
+
+# Setting up the plugin directory
+setUpPluginDir
+status=$?
+logStatus "Setting up Plugin directory: " $status 
+
+touch status.txt
+# Installing the plugins
+for plugins in essential_plugins
+do
+    checkRepoIsCloned "$plugins" "$HOME/.vim/pack/default/start" 1
+    status=$?
+    logStatus "Installing $plugins: " $status 
+done
+
+for plugins in optional_plugins
+do
+    checkRepoIsCloned "$plugins" "$HOME/.vim/pack/default/opt" 1
+    status=$?
+    logStatus "Setting up $plugins: " $status 
+done
+
+if [ "$INSTALL_YCM" = "YES" ] ; then
+    setUpYCM
+    status=$?
+    logStatus "Setting up YCM: " $status
+fi
+
+if [ "$INSTALL_CODEQUERY" = "YES" ] ; then
+    setUpCodeQuery
+    status=$?
+    logStatus "Setting up codequery: " $status
+fi
+
+if [ "$INSTALL_VIM_CODEQUERY" = "YES" ] ; then
+    setUpVimCodeQuery
+    status=$?
+    logStatus "Setting up vim-codequery: " $status
+fi
+
+echo "==================================================================="
+echo "Configuration of Dev status is complete"
+echo "==================================================================="
+echo "Status of the configuration"
+echo "+++++++++++++++++++++++++++++++++++++"
+cat $ORIGINAL_DIR/status.txt

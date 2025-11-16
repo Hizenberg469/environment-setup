@@ -1,0 +1,4 @@
+Setting up .virmc:  : Failure
+Setting up Plugin directory:  : Done
+Installing essential_plugins:  : Done
+Setting up optional_plusins:  : Done
