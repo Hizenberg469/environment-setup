@@ -289,13 +289,15 @@ function setUpVimrc {
     return $RETURN_SUCCESS
 }
 
-function getVimVersion {
-    version=$(vim --version | head -n 1 | awk '{print $5}')
-    checkStatus 1
-    version=$(echo "$ver_num" | bc -l)
-    checkStatus 1
+function checkVimVersion {
 
-    return version
+    ver_num=$(vim --version | head -n 1 | awk '{print $5}')
+    checkStatus 1
+    if (( $(echo "$ver_num >= 9.1" | bc -l) )) ; then
+        return $RETURN_SUCCESS
+    fi
+
+    return $RETURN_FAILURE
 }
 
 function setUpPluginDir {
@@ -330,6 +332,7 @@ function setUpYCM {
     checkStatus 0 "Failure!!! YCM is not configured for C/C++ projects"
     status=$?
     
+    echo "YCM is configured"
     cd $ORIGINAL_DIR
     return $status
 }
@@ -359,17 +362,11 @@ function setUpCodeQuery {
     )
 
     gui_packages=(
-        "libglx-dev"
-        "libgl1-mesa-dev"
-        "libvulkan-dev"
-        "libxkbcommon-dev"
-        "qt6-base-dev"
-        "qt6-base-dev-tools"
-        "qt6-tools-dev"
-        "qt6-tools-dev-tools"
-        "libqt6core5compact6-dev"
-        "qt6-l10n-tools"
-        "qt6-wayland"
+        "qtcreator"
+        "qtbase5-dev"
+        "qt5-qmake"
+        "qttools5-dev-tools"
+        "qttools5-dev"
     )
 
     for pkg in "${req_packages[@]}"
@@ -406,7 +403,7 @@ function setUpCodeQuery {
                 return $RETURN_FAILURE
             fi
         done
-        cmake -DCMAKE_INSTALL_PREFIX="$HOME/tools/codequery" -G Ninja -S . -B build
+        cmake -DCMAKE_INSTALL_PREFIX="$HOME/tools/codequery" -G Ninja -DBUILD_QT5=ON -S . -B build
     else
         cmake -DCMAKE_INSTALL_PREFIX="$HOME/tools/codequery" -G Ninja -DNO_GUI=ON -S . -B build
     fi
@@ -558,9 +555,9 @@ do
 done
 
 if [ "$INSTALL_YCM" = "YES" ] ; then
-    getVimVersion
-    version=$?
-    if (( $(echo "$version > 9.1" | bc -l) )) ; then
+    checkVimVersion
+    status=$?
+    if [ $status -eq $RETURN_SUCCESS ] ; then
         setUpYCM
         status=$?
         logStatus "Setting up YCM: " $status
@@ -571,9 +568,11 @@ fi
 
 if [ "$INSTALL_CODEQUERY" = "YES" ] ; then
     setUpCodeQuery
-    setUpStarscope 
     status=$?
     logStatus "Setting up codequery: " $status
+    setUpStarscope 
+    status=$?
+    logStatus "Setting up starscope: " $status
 fi
 
 if [ "$INSTALL_VIM_CODEQUERY" = "YES" ] ; then
