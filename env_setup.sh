@@ -475,7 +475,7 @@ if [ "$choise" = "yes" ] ; then
     touch $PWD/env_variable
 
     
-    for env_var in "${!environment_variable[@]}";
+    for env_var in "${environment_variable[@]}";
     do
        echo "$env_var=" >> $PWD/env_variable
     done
