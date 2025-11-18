@@ -270,7 +270,7 @@ function setUpVimrc {
         if [ "$(tail -1 $HOME/.vimrc)" != "\" My vimrc end -- Hizenberg" ] ; then
             mv $HOME/.vimrc $HOME/.vimrc.bck
             checkStatus 1
-            cp $my_vimrc $HOME/
+            cp $ORIGINAL_DIR/my_vimrc $HOME/
             checkStatus 1
             mv $HOME/.my_vimrc $HOME/.vimrc
             checkStatus 1
@@ -279,7 +279,7 @@ function setUpVimrc {
             return $RETURN_SUCCESS
         fi
     else
-        cp $my_vimrc $HOME/
+        cp $ORIGINAL_DIR/my_vimrc $HOME/
         checkStatus 1
         mv $HOME/.my_vimrc $HOME/.vimrc
         checkStatus 1
@@ -526,8 +526,13 @@ fi
 
 read -sp "Your password to executing requiring sudo access:" PASSWORD
 echo ""
+echo "$PASSWORD"
 
-rm $ORIGINAL_DIR/status.txt
+findFileOrDir "status.txt" "$ORIGINAL_DIR" "f"
+find_status=$?
+if [ $find_status -eq $RETURN_SUCCESS ] ; then
+    rm $ORIGINAL_DIR/status.txt
+fi
 # Setting the .vimrc first
 setUpVimrc
 status=$?
