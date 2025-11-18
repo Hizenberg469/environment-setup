@@ -102,8 +102,8 @@ function printStatus {
 
 
 # findFileOrDir <file or dir name> {(opt)dir} {(opt)type[f|d]} 
-# return "" if not found
-# return path to where it is present if found
+# return 255 if not found
+# return 0 if found
 function findFileOrDir {
     
     if [ $# -lt 1 ] ; then
@@ -452,11 +452,11 @@ echo "$BANNER"
 
 #   Start the setup
 environment_variable=(
-    "ORIGINAL_DIR",
-    "REPO_HOSTING_PLATFORM",
-    "CODEQUERY_GUI",
-    "INSTALL_YCM",
-    "INSTALL_CODEQUERY",
+    "ORIGINAL_DIR"
+    "REPO_HOSTING_PLATFORM"
+    "CODEQUERY_GUI"
+    "INSTALL_YCM"
+    "INSTALL_CODEQUERY"
     "INSTALL_VIM_CODEQUERY"
 )
 
@@ -467,7 +467,11 @@ echo "no  : To move on with configuration"
 read -p "Your choise : " choise
 
 if [ "$choise" = "yes" ] ; then
-    rm $PWD/env_variable
+    findFileOrDir "env_variable" "$ORIGINAL_DIR" "f"
+    find_status=$?
+    if [ $find_status -eq $RETURN_SUCCESS ] ; then
+       rm $PWD/env_variable
+    fi
     touch $PWD/env_variable
 
     
