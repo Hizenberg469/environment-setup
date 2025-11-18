@@ -467,7 +467,7 @@ echo "no  : To move on with configuration"
 read -p "Your choise : " choise
 
 if [ "$choise" = "yes" ] ; then
-    findFileOrDir "env_variable" "$ORIGINAL_DIR" "f"
+    findFileOrDir "env_variable" "$PWD" "f"
     find_status=$?
     if [ $find_status -eq $RETURN_SUCCESS ] ; then
        rm $PWD/env_variable
