@@ -281,7 +281,7 @@ function setUpVimrc {
     else
         cp $ORIGINAL_DIR/my_vimrc $HOME/
         checkStatus 1
-        mv $HOME/.my_vimrc $HOME/.vimrc
+        mv $HOME/my_vimrc $HOME/.vimrc
         checkStatus 1
     fi
 
