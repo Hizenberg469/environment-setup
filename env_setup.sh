@@ -32,20 +32,20 @@ RETURN_FAILURE=255
 PASSWORD=""
 my_vimrc='$ORIGINAL_DIR/my_vimrc'
 essential_plugins=( 
-    "WolfgangMehner/bash-support",
-    "WolfgangMehner/c-support",
-    "WolfgangMehner/perl-support",
-    "preservim/nerdtree",
-    "luochen1990/rainbow",
-    "preservim/tagbar",
-    "mbbill/undotree",
-    "vim-airline/vim-airline",
-    "vim-airline/vim-airline-themes",
-    "bfrg/vim-c-cpp-modern",
-    "kovetskiy/vim-bash",
-    "tomasiser/vim-code-dark",
-    "ArthurSonzogni/Diagon",
-    "tpope/vim-commentary",
+    "WolfgangMehner/bash-support"
+    "WolfgangMehner/c-support"
+    "WolfgangMehner/perl-support"
+    "preservim/nerdtree"
+    "luochen1990/rainbow"
+    "preservim/tagbar"
+    "mbbill/undotree"
+    "vim-airline/vim-airline"
+    "vim-airline/vim-airline-themes"
+    "bfrg/vim-c-cpp-modern"
+    "kovetskiy/vim-bash"
+    "tomasiser/vim-code-dark"
+    "wiwiiwiii/vim-diagon"
+    "tpope/vim-commentary"
     "tpope/vim-fugitive"
 )   
 
@@ -100,34 +100,6 @@ function printStatus {
     fi
 }
 
-# printStatus <message> <status> {(optional}expected-status>
-function logStatus {
-    
-    if [ $# -lt 2 ]  || [ $# -gt 3 ] ; then
-        echo -e "Status message and status return value is not passed.\nNeed to fail due to incorrect script."
-        exit $RETURN_FAILURE
-    fi
-
-    message=$1
-    status=$2
-    
-    expected_status_number=$RETURN_SUCCESS
-    if [ $# -gt 2 ] ; then
-       expected_status_number=$2
-    fi
-    
-    findFileOrDir "status.txt" "$ORIGINAL_DIR" "f" 
-    status=$?
-    if [ "$status" -ne $RETURN_SUCCESS ] ; then
-        touch "$ORIGINAL_DIR/status.txt"
-    fi
-    
-    if [ $status -ne $expected_status_number ] ; then
-        echo -e "$message : Failure" >> $ORIGINAL_DIR/status.txt
-    else
-        echo -e "$message : Done" >> $ORIGINAL_DIR/status.txt
-    fi
-}
 
 # findFileOrDir <file or dir name> {(opt)dir} {(opt)type[f|d]} 
 # return "" if not found
@@ -161,6 +133,36 @@ properly used."
     fi
     return $RETURN_FAILURE
 }
+
+# printStatus <message> <status> {(optional}expected-status>
+function logStatus {
+    
+    if [ $# -lt 2 ]  || [ $# -gt 3 ] ; then
+        echo -e "Status message and status return value is not passed.\nNeed to fail due to incorrect script."
+        exit $RETURN_FAILURE
+    fi
+
+    message=$1
+    status=$2
+    
+    expected_status_number=$RETURN_SUCCESS
+    if [ $# -gt 2 ] ; then
+       expected_status_number=$3
+    fi
+    
+    findFileOrDir "status.txt" "$ORIGINAL_DIR" "f" 
+    find_status=$?
+    if [ "$find_status" -ne $RETURN_SUCCESS ] ; then
+        touch "$ORIGINAL_DIR/status.txt"
+    fi
+    
+    if [ $status -ne $expected_status_number ] ; then
+        echo -e "$message : Failure" >> $ORIGINAL_DIR/status.txt
+    else
+        echo -e "$message : Done" >> $ORIGINAL_DIR/status.txt
+    fi
+}
+
 
 # checkPkgIsInstalled <pkg-name> {(opt)number -- whether to install the package}
 # number - 1 to install or 0 to not install. Defualt = 0
@@ -216,17 +218,17 @@ function checkRepoIsCloned {
     path=$2
     to_cloned=0
     if [ $# -gt 2 ] ; then
-        to_cloned=1
+        to_cloned=$3
     fi
 
     is_recursive=0
-    if [ $# -gt 2 ] ; then
-       is_recursive=$3 
+    if [ $# -gt 3 ] ; then
+       is_recursive=$4 
     fi
 
-    repo_hosting_platform=$REPO_HOSTING_PLATFORM
-    if [ $# -gt 3 ] ; then
-        repo_hosting_platform=$4
+    repo_hosting_platform="$REPO_HOSTING_PLATFORM"
+    if [ $# -gt 4 ] ; then
+        repo_hosting_platform=$5
     fi
 
     findFileOrDir "$repo_name" "$path" "d" 1
@@ -234,22 +236,26 @@ function checkRepoIsCloned {
     if [ "$is_dir_present" -eq $RETURN_FAILURE ] ; then
         if [ $to_cloned -eq 1 ] ; then
             if [ $is_recursive -eq 1 ] ; then
-                git clone --recurse-submodules "$repo_hosting_platform/$repo.git" "$path" 
+                cd $path
+                git clone --recurse-submodules "$repo_hosting_platform/$repo.git" 
+                cd $ORIGINAL_DIR
             else
-                git clone "$repo_hosting_platorm/$repo.git" "$path"
+                cd $path
+                git clone "$repo_hosting_platform/$repo.git"
+                cd $ORIGINAL_DIR
             fi
             
-            checkStatus 0 "Unsuccessful in cloning the repo: $repo"
+            checkStatus 0 "Unsuccessful in cloning the repo: $repo_name"
             status=$?
             if [ $status -eq 0 ] ; then
-                echo "Successfully cloned the repo: $repo"
+                echo "Successfully cloned the repo: $repo_name"
                 return $RETURN_SUCCESS #Clonned successfully
             fi
         else
-            echo "Repo : $repo is not present."
+            echo "Repo : $repo_name is not present."
         fi
     else
-        echo "Repo: $repo is already present"
+        echo "Repo: $repo_name is already present"
         return $RETURN_SUCCESS # Repo present
     fi
 
@@ -310,7 +316,7 @@ function setUpPluginDir {
 
 
 
-function setUpYCM {
+function setUpYCM { 
    
     checkRepoIsCloned "ycm-core/YouCompleteMe" "$HOME/.vim/pack/default/opt" 1 1
 
@@ -329,38 +335,46 @@ function setUpYCM {
 }
 
 
+function setUpStarscope {
+    
+    checkPkgIsInstalled "ruby-dev" 1
+    sudo gem install starscope
+    checkStatus 0 "Unsuccessful in installing starscope"
+    status=$?
+    return $status
+
+}
+
 function setUpCodeQuery {
     req_packages=(
-        build-essential,
-        g++,
-        git,
-        cmake,
-        ninja-build,
-        sqlite3,
-        libsqlite3-dev,
-        cscope,
-        pycscope,
-        starscope,
-        universal-ctags
+        "build-essential"
+        "g++"
+        "git"
+        "cmake"
+        "ninja-build"
+        "sqlite3"
+        "libsqlite3-dev"
+        "cscope"
+        "universal-ctags"
     )
 
     gui_packages=(
-        libglx-dev,
-        libgl1-mesa-dev,
-        libvulkan-dev,
-        libxkbcommon-dev,
-        qt6-base-dev,
-        qt6-base-dev-tools,
-        qt6-tools-dev,
-        qt6-tools-dev-tools,
-        libqt6core5compact6-dev,
-        qt6-l10n-tools,
-        qt6-wayland
+        "libglx-dev"
+        "libgl1-mesa-dev"
+        "libvulkan-dev"
+        "libxkbcommon-dev"
+        "qt6-base-dev"
+        "qt6-base-dev-tools"
+        "qt6-tools-dev"
+        "qt6-tools-dev-tools"
+        "libqt6core5compact6-dev"
+        "qt6-l10n-tools"
+        "qt6-wayland"
     )
 
-    for (( i=0 ; i < ${#req_packages[@]} ; i++ ))
+    for pkg in "${req_packages[@]}"
     do
-        checkPkgIsInstalled "$req_packages[$i]" 1
+        checkPkgIsInstalled "$pkg" 1
         status=$?
         
         if [ $status -ne 0 ] ; then
@@ -383,9 +397,9 @@ function setUpCodeQuery {
     cd $ORIGINAL_DIR/codequery
 
     if [ "$CODEQUERY_GUI" = "YES" ] ; then
-        for (( i=0 ; i < ${#gui_packages[@]} ; i++ ))
+        for pkg in "${gui_packages[$i]}" 
         do
-            checkPkgIsInstalled "$gui_packages[$i]" 1
+            checkPkgIsInstalled "$pkg" 1
             status=$?
 
             if [ $status -ne 0 ] ; then
@@ -510,6 +524,7 @@ else
 fi
 
 read -sp "Your password to executing requiring sudo access:" PASSWORD
+echo ""
 
 rm $ORIGINAL_DIR/status.txt
 # Setting the .vimrc first
@@ -524,14 +539,14 @@ logStatus "Setting up Plugin directory: " $status
 
 touch status.txt
 # Installing the plugins
-for plugins in essential_plugins
+for plugins in "${essential_plugins[@]}"
 do
     checkRepoIsCloned "$plugins" "$HOME/.vim/pack/default/start" 1
     status=$?
     logStatus "Installing $plugins: " $status 
 done
 
-for plugins in optional_plugins
+for plugins in "${optional_plugins[@]}"
 do
     checkRepoIsCloned "$plugins" "$HOME/.vim/pack/default/opt" 1
     status=$?
@@ -539,13 +554,20 @@ do
 done
 
 if [ "$INSTALL_YCM" = "YES" ] ; then
-    setUpYCM
-    status=$?
-    logStatus "Setting up YCM: " $status
+    getVimVersion
+    version=$?
+    if (( $(echo "$version > 9.1" | bc -l) )) ; then
+        setUpYCM
+        status=$?
+        logStatus "Setting up YCM: " $status
+    else
+        logStatus "Setting up YCM: " $RETURN_FAILURE
+    fi
 fi
 
 if [ "$INSTALL_CODEQUERY" = "YES" ] ; then
     setUpCodeQuery
+    setUpStarscope 
     status=$?
     logStatus "Setting up codequery: " $status
 fi
