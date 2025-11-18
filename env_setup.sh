@@ -428,13 +428,13 @@ function setUpCodeQuery {
 
 function setUpVimCodeQuery {
     
-    checkRepoIsCloned "Shougo/unite.vim" "$HOME/.vim/pack/default/opt/" 1
+    checkRepoIsCloned "Shougo/unite.vim" "$HOME/.vim/pack/default/opt" 1
     status=$?
     if [ $status -ne 0 ] ; then
         return $RETURN_FAILURE
     fi
 
-    checkRepoIsCloned "devjoe/vim-codequery" "$HOME/.vim/pack/default/opt/" 1
+    checkRepoIsCloned "devjoe/vim-codequery" "$HOME/.vim/pack/default/opt" 1
     status=$?
     if [ $status -ne 0 ] ; then
         return $RETURN_FAILURE
