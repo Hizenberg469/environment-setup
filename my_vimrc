@@ -314,7 +314,7 @@ function! GutenTagsEnable() abort
     echo "Gutentags + Plus enabled"
 endfunction
 
-function! s:GTagsDisable() abort
+function! s:GutenTagsDisable() abort
     let g:gutentags_enabled = 0
 
     if exists(':GscopeKill') | silent! GscopeKill | endif
@@ -323,6 +323,6 @@ function! s:GTagsDisable() abort
 endfunction
 
 command! GTagOn  call s:GutenTagsEnable()
-command! GTagOff call s:GTagsDisable()
+command! GTagOff call s:GutenTagsDisable()
 
 " My vimrc end -- Hizenberg
