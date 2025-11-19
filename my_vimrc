@@ -322,4 +322,7 @@ function! s:GTagsDisable() abort
     echo "Gutentags disabled"
 endfunction
 
+command! GTagOn  call s:GutenTagsEnable()
+command! GTagOff call s:GTagsDisable()
+
 " My vimrc end -- Hizenberg
