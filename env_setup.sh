@@ -51,8 +51,18 @@ essential_plugins=(
 
 optional_plugins=(
     "dense-analysis/ale"
+    "vim-scripts/OmniCppComplete"
+    "ludovicchabant/vim-gutentags"
+    "skywind3000/gutentags_plus"
 )
 
+essential_pkg=(
+    "build-essential"
+    "gdb"
+    "cscope"
+    "universal-ctags"
+    "global"
+)
 # checkStatus 1 -- To exit the script
 # checkStatus 0 -- To return 255(failure) value
 # checkStatus <status> {(optional)status-message}
@@ -544,6 +554,16 @@ status=$?
 logStatus "Setting up Plugin directory: " $status 
 
 touch status.txt
+
+# Installing packages
+
+for pkg in "${essential_pkg[@]}"
+do
+    checkPkgIsInstalled "$pkg" 1
+    status=$?
+    logStatus "Installing $pkg: " $status 
+done
+
 # Installing the plugins
 for plugins in "${essential_plugins[@]}"
 do
