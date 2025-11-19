@@ -187,6 +187,18 @@ let g:airline#extensions#tabline#enabled = 1
 let g:airline#extensions#tabline#formatter = 'default'
 
 
+" Nerdtree -- File Explorer
+"+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+let g:NERDTreeWinSize = 30
+nnoremap <C-n> :NERDTreeToggle<CR>
+let NERDTreeIgnore = ['\.o$', '\.obj$', '\.a$', '\.so$', '\.out$', '\.git$']
+let NERDTreeShowHidden = 1
+
+
+" Undotree
+"+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+nmap <F5> :UndotreeToggle<CR>
+
 " YCM : YouCompleteMe
 "++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
