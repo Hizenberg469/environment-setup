@@ -47,6 +47,7 @@ essential_plugins=(
     "wiwiiwiii/vim-diagon"
     "tpope/vim-commentary"
     "tpope/vim-fugitive"
+    "ivechan/gtags"
 )   
 
 optional_plugins=(
