@@ -155,22 +155,11 @@ let g:cpp_operator_highlight = 1
 " (affects both C and C++ files)
 let g:cpp_simple_highlight = 1
 
+let g:rainbow_active = 1
 
-" Color scheme for vim
-" vscode
-"+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-" If you don't like many colors and prefer the conservative style of the standard Visual Studio
-let g:codedark_conservative=1
-" If you like the new dark modern colors (Needs feedback!)
-let g:codedark_modern=1
-" Activates italicized comments (make sure your terminal supports italics)
-let g:codedark_italics=1
-" Make the background transparent
-let g:codedark_transparent=1
-" If you have vim-airline, you can also enable the provided theme
-let g:airline_theme = 'codedark'
-
-colorscheme codedark
+"colorscheme default
+syntax enable
+colorscheme dracula
 
 " Tagbar
 "++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -182,7 +171,7 @@ nmap <F8> :TagbarToggle<CR>
 
 " Set this. Airline will handle the rest.
 " let g:airline#extensions#ale#enabled = 1
-let g:airline_theme = 'dark'
+let g:airline_theme = 'dracula'
 let g:airline#extensions#tabline#enabled = 1
 let g:airline#extensions#tabline#formatter = 'default'
 
@@ -231,6 +220,31 @@ function! s:ALEEnable() abort
     let g:ale_sign_column_always = 1
     let g:ale_disable_lsp = 1
 
+    let g:ale_cpp_cppcheck_options =
+    \ '--enable=warning,style,performance,portability ' .
+    \ '--std=c++17 ' .
+    \ '--inline-suppr ' .
+    \ '--quiet'
+
+    let g:ale_c_cppcheck_options =
+    \ '--enable=warning,style,performance,portability ' .
+    \ '--std=c11 ' .
+    \ '--inline-suppr ' .
+    \ '--quiet'
+    
+    let g:ale_c_cppcheck_executable = 'cppcheck'
+    let g:ale_cpp_cppcheck_executable = 'cppcheck'
+    let g:ale_c_build_dir_names = ['build', 'release', 'debug']
+    
+    let g:ale_cpp_cppcheck_options .=
+    \ ' --suppress=missingIncludeSystem' .
+    \ ' --suppress=unusedFunction'
+
+    let g:ale_c_cppcheck_options .=
+    \ ' --suppress=missingIncludeSystem' .
+    \ ' --suppress=unusedFunction'
+
+
     " Set this. Airline will handle the rest.
     let g:airline#extensions#ale#enabled = 1
 
@@ -263,78 +277,32 @@ endfunction
 command! ALEOn  call s:ALEEnable()
 command! ALEOff call s:ALEDisable()
 
-" Codequery
-"++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-function! s:CodeQueryEnable() abort
-    silent! packadd unite.vim
-    silent! packadd vim-codequery
+" COC.nvim
+"+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-    echo "CodeQuery setup done"
+function! s:COCEnable() abort
+let g:coc_global_extensions = ['coc-clangd']
+let g:clangd_install_prefix = '/usr/'
+let g:clangd_command = ['clangd',
+\   '--clang-tidy',
+\   '--background-index',
+\   '--header-insertion-decorators=0',
+\   '--completion-style=detailed']
+
+nnoremap <silent> K :call <sid>show_documentation()<cr>
+function! s:show_documentation()
+    if index(['vim', 'help'], &filetype) >= 0
+	execute 'help ' . expand('<cword>')
+    elseif &filetype ==# 'tex'
+	VimtexDocPackage
+    else
+	call CocAction('doHover')
+    endif
 endfunction
 
-command! CQOn  call s:CodeQueryEnable()
-
-
-" Gutentags -- Gtags
-"+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-function! GutenTagsEnable() abort
-
-    "let g:gutentags_file_list_command = 'find tj100_mc/ modules/ce/ modules/ethCommon/ modules/ethTransport/ common/ -type f \( -name "*.[ch]" -o -name "*.cpp" -o -name "*.hpp" -o -name "*.js" -o -name "*.pl" -o -name "*.sh"\)'
-
-    "let g:gutentags_ctags_extra_args = [
-    "            \'--language=C,C++,Javascript,Perl,Sh',
-    "            \'--langmap=C:+.c.h',
-    "            \'--langmap=C++:+.cpp.hpp.cc.hh',
-    "            \'--langmap=Javascript:+.js',
-    "            \'--langmap=Perl:+.pl.pm',
-    "            \'--langmap=Sh:+.sh',
-    "            \'--langmap=mib:+.mib'
-    "            \]
-
-    " For ctags and gtags_plus configuration
-    " enable gtags module
-    let g:gutentags_modules = ['ctags', 'gtags_cscope']
-
-    " config project root markers.
-    let g:gutentags_add_default_project_roots = 0
-    let g:gutentags_project_roots = ['.root']
-
-    " Put the ctags file in <project>/.root/tags (path is relative to project root)
-    let g:gutentags_ctags_tagfile = expand('$PWD/.root/tags')
-
-    " Store GNU Global (gtags) databases under <project>/.root/ (instead of ~/.cache/tags)
-    let g:gutentags_cache_dir = expand('$PWD/.root')
-
-    " To let gutentag_plus manage the connection with gtags instead of gutentags.
-    "let g:gutentags_auto_add_gtags_cscope = 1
-    
-    let g:gutentags_define_advanced_commnads = 1
-
-    " change focus to quickfix window after search (optional).
-    let g:gutentags_plus_switch = 1
-    let g:gutentags_plus_nomap = 1
-    noremap <silent> <leader>gs :GscopeFind s <C-R><C-W><cr>
-    noremap <silent> <leader>gg :GscopeFind g <C-R><C-W><cr>
-    noremap <silent> <leader>gc :GscopeFind c <C-R><C-W><cr>
-    noremap <silent> <leader>gt :GscopeFind t <C-R><C-W><cr>
-    noremap <silent> <leader>ge :GscopeFind e <C-R><C-W><cr>
-    noremap <silent> <leader>gf :GscopeFind f <C-R>=expand("<cfile>")<cr><cr>
-    noremap <silent> <leader>gi :GscopeFind i <C-R>=expand("<cfile>")<cr><cr>
-    noremap <silent> <leader>gd :GscopeFind d <C-R><C-W><cr>
-    noremap <silent> <leader>ga :GscopeFind a <C-R><C-W><cr>
-    noremap <silent> <leader>gz :GscopeFind z <C-R><C-W><cr>
-    echo "Gutentags + Plus enabled"
+    echo "COC enabled"
 endfunction
 
-function! s:GutenTagsDisable() abort
-    let g:gutentags_enabled = 0
-
-    if exists(':GscopeKill') | silent! GscopeKill | endif
-    
-    echo "Gutentags disabled"
-endfunction
-
-command! GTagOn  call s:GutenTagsEnable()
-command! GTagOff call s:GutenTagsDisable()
+command! COCOn  call s:COCEnable()
 
 " My vimrc end -- Hizenberg

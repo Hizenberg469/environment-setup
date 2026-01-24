@@ -43,27 +43,37 @@ essential_plugins=(
     "vim-airline/vim-airline-themes"
     "bfrg/vim-c-cpp-modern"
     "kovetskiy/vim-bash"
-    "tomasiser/vim-code-dark"
     "wiwiiwiii/vim-diagon"
     "tpope/vim-commentary"
     "tpope/vim-fugitive"
     "ivechan/gtags.vim"
+    "dense-analysis/ale"
+    "neoclide/coc.nvim"
+    "dracula/vim"
 )   
 
 optional_plugins=(
-    "dense-analysis/ale"
     "vim-scripts/OmniCppComplete"
-    "ludovicchabant/vim-gutentags"
-    "skywind3000/gutentags_plus"
+#    "ludovicchabant/vim-gutentags"
+#    "skywind3000/gutentags_plus"
 )
 
 essential_pkg=(
     "build-essential"
     "gdb"
+    "gdb-multiarch"
     "cscope"
     "universal-ctags"
     "global"
+    "cppcheck"
+    "nodejs"
 )
+
+essential_cmd=(
+    "sudo curl -sL install-node.vercel.app/lts | sudo bash"
+)
+
+
 # checkStatus 1 -- To exit the script
 # checkStatus 0 -- To return 255(failure) value
 # checkStatus <status> {(optional)status-message}
@@ -555,6 +565,16 @@ status=$?
 logStatus "Setting up Plugin directory: " $status 
 
 touch status.txt
+
+
+# Executing command
+
+for cmd in "${essential_cmd[@]}"
+do
+    bash -c "$cmd" 
+    status=$?
+    logStatus "Executing '$cmd': " $status 
+done
 
 # Installing packages
 
