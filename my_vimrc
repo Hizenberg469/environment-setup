@@ -280,6 +280,13 @@ command! ALEOff call s:ALEDisable()
 " COC.nvim
 "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
+" Making selected --> autocomplete
+inoremap <expr> <cr> coc#pum#visible() ? coc#pum#confirm() : "\<CR>"
+
+" To navigate completion lists
+inoremap <expr> <Tab> coc#pum#visible() ? coc#pum#next(1) : "\<Tab>"
+inoremap <expr> <S-Tab> coc#pum#visible() ? coc#pum#prev(1) : "\<S-Tab>"
+
 let g:coc_global_extensions = ['coc-clangd']
 let g:clangd_install_prefix = '/usr/'
 let g:clangd_command = ['clangd',
