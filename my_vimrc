@@ -280,7 +280,6 @@ command! ALEOff call s:ALEDisable()
 " COC.nvim
 "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-function! s:COCEnable() abort
 let g:coc_global_extensions = ['coc-clangd']
 let g:clangd_install_prefix = '/usr/'
 let g:clangd_command = ['clangd',
@@ -300,9 +299,5 @@ function! s:show_documentation()
     endif
 endfunction
 
-    echo "COC enabled"
-endfunction
-
-command! COCOn  call s:COCEnable()
 
 " My vimrc end -- Hizenberg
