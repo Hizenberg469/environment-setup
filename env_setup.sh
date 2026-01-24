@@ -337,6 +337,17 @@ function setUpPluginDir {
     return $RETURN_SUCCESS
 }
 
+# Final configuration for coc.nvim
+function setUpCOC {
+
+    cd $HOME/.vim/pack/default/start
+
+    npm ci
+    
+    checkStatus 0 "COC plugin is not fully configured!!"
+
+    return $RETURN_SUCCESS
+}
 
 
 function setUpYCM { 
@@ -599,6 +610,11 @@ do
     status=$?
     logStatus "Setting up $plugins: " $status 
 done
+
+# Setting up coc.nvim plugin
+setUpCOC
+status=$?
+logStatus "Configurating coc.nvim : " $status
 
 if [ "$INSTALL_YCM" = "YES" ] ; then
     checkVimVersion
