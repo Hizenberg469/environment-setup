@@ -202,80 +202,50 @@ command! YCMOn  call s:YCMEnable()
 " ALE : Linting 
 "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-function! s:ALEEnable() abort
-    silent! packadd ale
 
-    let g:ale_linters = {
-    \   'cpp': ['cppcheck'],
-    \   'c': ['cppcheck'],
-    \   }
+let g:ale_linters = {
+\   'cpp': ['cppcheck'],
+\   'c': ['cppcheck'],
+\   }
 
-    " General settings
-    let g:ale_linters_explicit = 1
-    let g:ale_completion_enabled = 1
-    let g:ale_echo_msg_format = '[%linter%] %s [%severity%]'
-    let g:ale_set_balloons=1
-    let g:ale_hover_to_floating_preview=1
-    let g:ale_use_global_executables = 1
-    let g:ale_sign_column_always = 1
-    let g:ale_disable_lsp = 1
+" General settings
+let g:ale_linters_explicit = 1
+let g:ale_completion_enabled = 1
+let g:ale_echo_msg_format = '[%linter%] %s [%severity%]'
+let g:ale_set_balloons=1
+let g:ale_hover_to_floating_preview=1
+let g:ale_use_global_executables = 1
+let g:ale_sign_column_always = 1
+let g:ale_disable_lsp = 1
 
-    let g:ale_cpp_cppcheck_options =
-    \ '--enable=warning,style,performance,portability ' .
-    \ '--std=c++17 ' .
-    \ '--inline-suppr ' .
-    \ '--quiet'
+let g:ale_cpp_cppcheck_options =
+\ '--enable=warning,style,performance,portability ' .
+\ '--std=c++17 ' .
+\ '--inline-suppr ' .
+\ '--quiet'
 
-    let g:ale_c_cppcheck_options =
-    \ '--enable=warning,style,performance,portability ' .
-    \ '--std=c11 ' .
-    \ '--inline-suppr ' .
-    \ '--quiet'
-    
-    let g:ale_c_cppcheck_executable = 'cppcheck'
-    let g:ale_cpp_cppcheck_executable = 'cppcheck'
-    let g:ale_c_build_dir_names = ['build', 'release', 'debug']
-    
-    let g:ale_cpp_cppcheck_options .=
-    \ ' --suppress=missingIncludeSystem' .
-    \ ' --suppress=unusedFunction'
+let g:ale_c_cppcheck_options =
+\ '--enable=warning,style,performance,portability ' .
+\ '--std=c11 ' .
+\ '--inline-suppr ' .
+\ '--quiet'
 
-    let g:ale_c_cppcheck_options .=
-    \ ' --suppress=missingIncludeSystem' .
-    \ ' --suppress=unusedFunction'
+let g:ale_c_cppcheck_executable = 'cppcheck'
+let g:ale_cpp_cppcheck_executable = 'cppcheck'
+let g:ale_c_build_dir_names = ['build', 'release', 'debug']
+
+let g:ale_cpp_cppcheck_options .=
+\ ' --suppress=missingIncludeSystem' .
+\ ' --suppress=unusedFunction'
+
+let g:ale_c_cppcheck_options .=
+\ ' --suppress=missingIncludeSystem' .
+\ ' --suppress=unusedFunction'
 
 
-    " Set this. Airline will handle the rest.
-    let g:airline#extensions#ale#enabled = 1
+" Set this. Airline will handle the rest.
+let g:airline#extensions#ale#enabled = 1
 
-    echo "ALE enabled"
-endfunction
-
-function! s:ALEDisable() abort
-    
-    let g:ale_linters = {
-    \   'cpp': [''],
-    \   'c': [''],
-    \   }
-
-    " General settings
-    let g:ale_linters_explicit = 0 
-    let g:ale_completion_enabled = 0 
-    let g:ale_echo_msg_format = ''
-    let g:ale_set_balloons = 0
-    let g:ale_hover_to_floating_preview = 0
-    let g:ale_use_global_executables = 0
-    let g:ale_sign_column_always = 0 
-    let g:ale_disable_lsp = 0
-
-    " Set this. Airline will handle the rest.
-    let g:airline#extensions#ale#enabled = 0
-
-    echo "ALE disabled"
-endfunction
-
-command! ALEOn  call s:ALEEnable()
-command! ALEOff call s:ALEDisable()
 
 " COC.nvim
 "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
